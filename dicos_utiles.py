@@ -83,7 +83,7 @@ dico_dates = {
 dico_box_2019 = {}
 for equipe in list(nom_a_abrev):
     dico_box_2019[nom_a_abrev[equipe]] = pd.read_csv(
-        open('/ content/drive/MyDrive/Projet TTFL/Recup_Raw/' + nom_a_abrev[equipe] + '2019.csv'))
+        open('/Users/thomaslouis/Documents/Documents/Projet/TTFL/Recup_Raw/' + nom_a_abrev[equipe] + '2019.csv'))
 
 del dico_box_2019['LAC']['Unnamed: 0.1']
 del dico_box_2019['MIN']['Unnamed: 0.1']
@@ -102,7 +102,7 @@ dico_box = {'2019': dico_box_2019,
 dico_roster_2019 = {}
 for equipe in list(nom_a_abrev):
     dico_roster_2019[nom_a_abrev[equipe]] = pd.read_csv(
-        open('/content/drive/MyDrive/Projet TTFL/Rosters/Roster_' + nom_a_abrev[equipe] + '2019.csv'))
+        open('/Users/thomaslouis/Documents/Documents/Projet/TTFL/Rosters/Roster_' + nom_a_abrev[equipe] + '2019.csv'))
 
 dico_roster_2018 = {}
 
@@ -114,6 +114,8 @@ dico_roster = {'2019': dico_roster_2019,
 
 # Importer les schedules :
 
-dico_schedule = {'2019': pd.read_csv(open('/content/drive/MyDrive/Projet TTFL/Schedules/Schedule2019.csv'))}
+dico_schedule = {'2019': pd.read_csv(open('/Users/thomaslouis/Documents/Documents/Projet/TTFL/Schedules/Schedule2019.csv'))}
+
+dico_inputs_train = {'2019' : (pd.read_csv(open('/Users/thomaslouis/Documents/Documents/Projet/TTFL/Inputs/X2019.csv')), pd.read_csv(open('/Users/thomaslouis/Documents/Documents/Projet/TTFL/Inputs/Y2019.csv')))}
 
 deja_fait = []

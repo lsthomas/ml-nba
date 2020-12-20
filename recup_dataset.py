@@ -1,7 +1,13 @@
+import pandas as pd
+
 # equipe = Nom Complet
 # Annee = Année de fin de saison
 # -> ['DATE', 'VISITOR', 'VISITOR_PTS', 'HOME', 'HOME_PTS'] de l'équipe demandée, dans l'année demandée indexé de 0 à 81
-from dicos_utiles import dico_schedule
+from basketball_reference_scraper.box_scores import get_box_scores
+from basketball_reference_scraper.seasons import get_schedule
+from basketball_reference_scraper.teams import get_roster
+
+from dicos_utiles import dico_schedule, nom_a_abrev, dico_box_2019, deja_fait
 
 
 def recup_matchs(equipe, annee):

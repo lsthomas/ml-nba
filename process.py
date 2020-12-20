@@ -38,8 +38,8 @@ def enlever_joueurs(box_score_total):
 def clean_DNP(box_score_total):
     return box_score_total.loc[
         (box_score_total['MP'] != 'Did Not Play') & (box_score_total['MP'] != 'Did Not Dress') & (
-                    box_score_total['MP'] != 'Not With Team') & (box_score_total['AST%'] != 'Did Not Play') & (
-                    box_score_total['AST%'] != 'Did Not Dress')]
+                box_score_total['MP'] != 'Not With Team') & (box_score_total['AST%'] != 'Did Not Play') & (
+                box_score_total['AST%'] != 'Did Not Dress')]
 
 
 # Transforme les Minutes played en secondes
@@ -129,7 +129,7 @@ def moyennes(date_debut, date_fin, box_score_saison_joueur):
     del box_entre_dates['FG%']
     box = box_entre_dates.astype(float)
     box['TTFL'] = box['PTS'] + box['TRB'] + box['AST'] + box['STL'] + box['BLK'] + 2 * (
-                box['FG'] + box['3P'] + box['FT']) - (box['TOV'] + box['FGA'] + box['3PA'] + box['FTA'])
+            box['FG'] + box['3P'] + box['FT']) - (box['TOV'] + box['FGA'] + box['3PA'] + box['FTA'])
     return box.mean()
 
 
@@ -214,7 +214,7 @@ moyennes_equipe('2019-01-01', '2020-01-01', box_score_totaux_equipe_propre(dico_
 def moyennes_sur_x_derniers_matchs_equipe(x, date, box_score_equipe, annee):
     date_debut_saison, date_fin_saison = dico_dates[annee]
     box_score_saison_avant_date = box_score_equipe.loc[box_score_equipe['DATE'] <= date]
-    if box_score_saison_avant_date is None:  # Pas encore de matchs joués
+    if box_score_saison_avant_date is None:                       # Pas encore de matchs joués
         return None
     if box_score_saison_avant_date.shape[0] < x:
         return moyennes_equipe(date_debut_saison, date, box_score_equipe)
@@ -247,8 +247,7 @@ def input_total(joueur, date, equipe, equipe_opp):
     X_joueur = input_joueur(joueur, date)
     X_equipe = input_equipes(date, equipe, equipe_opp)
     X = pd.concat([X_joueur, X_equipe, repos])
-    return X
-
+    return pd.DataFrame([X.values], columns=X.index)
 
 
 def Y_total(joueur, date, equipe):
@@ -260,17 +259,31 @@ def Y_total(joueur, date, equipe):
     del box['DATE']
     box = box.astype(float)
     resu = box['PTS'] + box['TRB'] + box['AST'] + box['STL'] + box['BLK'] + 2 * (box['FG'] + box['3P'] + box['FT']) - (
-                box['TOV'] + box['FGA'] + box['3PA'] + box['FTA'])
+            box['TOV'] + box['FGA'] + box['3PA'] + box['FTA'])
     return resu
 
 
 """## Build X_train, Y_train"""
 
 
-def build(date_debut_build):
+def corriger_nan(X, Y):
+    i = 0
+    while i < X.shape[0]:
+        nan = False
+        for j in range(125):
+            if np.isnan(X[i][j]):
+                nan = True
+        if nan:
+            X = np.delete(X, i, 0)
+            Y = np.delete(Y, i, 0)
+        i += 1
+    return X, Y
+
+
+def build_train(date_debut_build):
     annee = date_to_saison(date_debut_build)
-    X = pd.Dataframe()
-    Y = pd.Dataframe()
+    X = pd.DataFrame()
+    Y = pd.DataFrame()
     for equipe in list(nom_a_abrev):
         if not (equipe in deja_fait):
             print(equipe)
@@ -285,8 +298,35 @@ def build(date_debut_build):
                     equipe_opp = schedule.loc[schedule['DATE'] == date].reset_index(drop=True)['HOME'][0]
                 else:
                     equipe_opp = schedule.loc[schedule['DATE'] == date].reset_index(drop=True)['VISITOR'][0]
-                X = pd.merge((X, input_total(joueur, date, nom_a_abrev[equipe], nom_a_abrev[equipe_opp])), axis=1)
-                Y = pd.merge((Y, Y_total(joueur, date, nom_a_abrev[equipe])), axis=1)
+                X = pd.concat((X, input_total(joueur, date, nom_a_abrev[equipe], nom_a_abrev[equipe_opp])))
+                Y = pd.concat((Y, Y_total(joueur, date, nom_a_abrev[equipe])))
     X.to_csv('X' + annee + '.csv')
-    Y.to_csv('Y' + annee)
+    Y.to_csv('Y' + annee + '.csv')
+    return X, Y
+
+
+def build_test(date_debut, date_fin):
+    annee = date_to_saison(date_debut)
+    X = np.empty([125, 1])
+    Y = np.empty([1, 1])
+    for equipe in list(nom_a_abrev):
+        if not (equipe in deja_fait):
+            print(equipe)
+            schedule = recup_matchs(equipe, annee)
+            box_score_total = dico_box[annee][nom_a_abrev[equipe]]
+            box = clean_DNP(enlever_totals(box_score_total))
+            box = box.loc[box['DATE'] >= date_debut].reset_index(drop=True)
+            box = box.loc[box['DATE'] <= date_fin].reset_index(drop=True)
+            for match in range(box.shape[0]):
+                date = box['DATE'][match]
+                joueur = box['PLAYER'][match]
+                if schedule.loc[schedule['DATE'] == date]['VISITOR'].reset_index(drop=True)[0] == equipe:
+                    equipe_opp = schedule.loc[schedule['DATE'] == date].reset_index(drop=True)['HOME'][0]
+                else:
+                    equipe_opp = schedule.loc[schedule['DATE'] == date].reset_index(drop=True)['VISITOR'][0]
+                X = pd.concat((X, input_total(joueur, date, nom_a_abrev[equipe], nom_a_abrev[equipe_opp])))
+                Y = pd.concat((Y, Y_total(joueur, date, nom_a_abrev[equipe])))
+    X = np.delete(X, 0, 1)
+    Y = np.delete(Y, 0, 1)
+    X, Y = corriger_nan(X, Y)
     return X, Y
