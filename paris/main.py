@@ -3,6 +3,9 @@ import numpy as np
 from process import build_train, input_total, Y_total, build_test, input_equipes
 import pandas as pd
 
+from process_paris import build_paris
 
 
-print(dico_schedule['2019'])
+dataset =
+
+model = train(data)

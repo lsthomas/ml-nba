@@ -20,8 +20,6 @@ print(dataset_train.values.shape)
 #features = ["TTFL.1"]
 features = ['TTFL.1','DRtg.3','REP','EQ/OPP']
 
-
-
 print(features)
 
 # x = dataset_train["TTFL.1"].values
