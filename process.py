@@ -214,16 +214,13 @@ moyennes_equipe('2019-01-01', '2020-01-01', box_score_totaux_equipe_propre(dico_
 def moyennes_sur_x_derniers_matchs_equipe(x, date, box_score_equipe, annee):
     date_debut_saison, date_fin_saison = dico_dates[annee]
     box_score_saison_avant_date = box_score_equipe.loc[box_score_equipe['DATE'] <= date]
-    if box_score_saison_avant_date is None:                       # Pas encore de matchs joués
+    if box_score_saison_avant_date is None:  # Pas encore de matchs joués
         return None
     if box_score_saison_avant_date.shape[0] < x:
         return moyennes_equipe(date_debut_saison, date, box_score_equipe)
     else:
         date_match_moins_x = box_score_saison_avant_date['DATE'].iloc[-x]
         return moyennes_equipe(date_match_moins_x, date, box_score_equipe)
-
-
-dt.datetime.strptime('2020-01-01', '%Y-%m-%d')
 
 
 def input_equipes(date, equipe, equipe_opp):
@@ -260,30 +257,21 @@ def Y_total(joueur, date, equipe):
     box = box.astype(float)
     resu = box['PTS'] + box['TRB'] + box['AST'] + box['STL'] + box['BLK'] + 2 * (box['FG'] + box['3P'] + box['FT']) - (
             box['TOV'] + box['FGA'] + box['3PA'] + box['FTA'])
-    return resu
+    return float(resu.values[0])
 
 
 """## Build X_train, Y_train"""
 
 
-def corriger_nan(X, Y):
-    i = 0
-    while i < X.shape[0]:
-        nan = False
-        for j in range(125):
-            if np.isnan(X[i][j]):
-                nan = True
-        if nan:
-            X = np.delete(X, i, 0)
-            Y = np.delete(Y, i, 0)
-        i += 1
-    return X, Y
+def check_nan(X):
+    array_sum = np.sum(X)
+    array_has_nan = np.isnan(array_sum)
+    return array_has_nan.values
 
 
 def build_train(date_debut_build):
     annee = date_to_saison(date_debut_build)
-    X = pd.DataFrame()
-    Y = pd.DataFrame()
+    dataset = pd.DataFrame()
     for equipe in list(nom_a_abrev):
         if not (equipe in deja_fait):
             print(equipe)
@@ -298,17 +286,17 @@ def build_train(date_debut_build):
                     equipe_opp = schedule.loc[schedule['DATE'] == date].reset_index(drop=True)['HOME'][0]
                 else:
                     equipe_opp = schedule.loc[schedule['DATE'] == date].reset_index(drop=True)['VISITOR'][0]
-                X = pd.concat((X, input_total(joueur, date, nom_a_abrev[equipe], nom_a_abrev[equipe_opp])))
-                Y = pd.concat((Y, Y_total(joueur, date, nom_a_abrev[equipe])))
-    X.to_csv('X' + annee + '.csv')
-    Y.to_csv('Y' + annee + '.csv')
-    return X, Y
+                input = input_total(joueur, date, nom_a_abrev[equipe], nom_a_abrev[equipe_opp])
+                input['Target'] = [Y_total(joueur, date, nom_a_abrev[equipe])]
+                if not (input.isnull().values.any()):
+                    dataset = pd.concat((dataset, input))
+    dataset.to_csv('dataset' + annee + '.csv')
+    return dataset
 
 
 def build_test(date_debut, date_fin):
     annee = date_to_saison(date_debut)
-    X = np.empty([125, 1])
-    Y = np.empty([1, 1])
+    dataset = pd.DataFrame()
     for equipe in list(nom_a_abrev):
         if not (equipe in deja_fait):
             print(equipe)
@@ -324,9 +312,10 @@ def build_test(date_debut, date_fin):
                     equipe_opp = schedule.loc[schedule['DATE'] == date].reset_index(drop=True)['HOME'][0]
                 else:
                     equipe_opp = schedule.loc[schedule['DATE'] == date].reset_index(drop=True)['VISITOR'][0]
-                X = pd.concat((X, input_total(joueur, date, nom_a_abrev[equipe], nom_a_abrev[equipe_opp])))
-                Y = pd.concat((Y, Y_total(joueur, date, nom_a_abrev[equipe])))
-    X = np.delete(X, 0, 1)
-    Y = np.delete(Y, 0, 1)
-    X, Y = corriger_nan(X, Y)
-    return X, Y
+                input = input_total(joueur, date, nom_a_abrev[equipe], nom_a_abrev[equipe_opp])
+                input['Target'] = [Y_total(joueur, date, nom_a_abrev[equipe])]
+                if not (input.isnull().values.any()):
+                    dataset = pd.concat((dataset, input))
+    dataset.to_csv('dataset_test' + annee + '.csv')
+    return dataset
+

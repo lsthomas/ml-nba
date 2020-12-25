@@ -1,7 +1,7 @@
 import pandas as pd
 
 nom_a_abrev_old = {'Atlanta Hawks': 'ATL',
-                   'Boston Celtics': 'BOS',
+                    'Boston Celtics': 'BOS',
                    'Brooklyn Nets': 'BRK',
                    'Charlotte Bobcats': 'CHA',
                    'Charlotte Hornets': 'CHO',
@@ -116,6 +116,9 @@ dico_roster = {'2019': dico_roster_2019,
 
 dico_schedule = {'2019': pd.read_csv(open('/Users/thomaslouis/Documents/Documents/Projet/TTFL/Schedules/Schedule2019.csv'))}
 
-dico_inputs_train = {'2019' : (pd.read_csv(open('/Users/thomaslouis/Documents/Documents/Projet/TTFL/Inputs/X2019.csv')), pd.read_csv(open('/Users/thomaslouis/Documents/Documents/Projet/TTFL/Inputs/Y2019.csv')))}
+dico_inputs_train = {'2019' : pd.read_csv(open('/Users/thomaslouis/Documents/Documents/Projet/TTFL/Inputs/dataset2019.csv'))}
+
+dico_inputs_test = {'2019' : pd.read_csv(open('/Users/thomaslouis/Documents/Documents/Projet/TTFL/Inputs/dataset2019.csv'))}
+
 
 deja_fait = []

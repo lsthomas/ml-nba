@@ -1,13 +1,8 @@
-from NN_model import MSE
-from dicos_utiles import dico_inputs_train
-from process import build_train, input_total
+from dicos_utiles import dico_inputs_train, nom_a_abrev, dico_schedule
+import numpy as np
+from process import build_train, input_total, Y_total, build_test, input_equipes
 import pandas as pd
 
 
-X,Y = dico_inputs_train['2019']
-Y_pred_base = X['TTFL'].values
-pd.concat((None,pd.DataFrame))v
-print(Y.shape)
-print(X.shape)
-print(MSE(Y,Y_pred_base))
 
+print(dico_schedule['2019'])

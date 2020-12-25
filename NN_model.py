@@ -61,23 +61,19 @@ def corriger_nan(X, Y):
     return X, Y
 
 
-def check_nan(X):
-    array_sum = np.sum(X)
-    array_has_nan = np.isnan(array_sum)
-    print(array_has_nan)
+def check_nan(df):
+    df.isnull().values.any()
 
 
 
 def baseline(X):
     """"X : """
-    m, n = X.shape
+    m, n = dico_inputs_train.shape
     Y_base = np.empty([m, 1])
     for i in range(m):
         Y_base[i, 0] = X[i, 67]
     return Y_base
 
 
-def MSE(Y, Y_pred):
-    return np.mean(np.square(Y - Y_pred))
 
 
