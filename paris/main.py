@@ -5,7 +5,3 @@ import pandas as pd
 
 from process_paris import build_paris
 
-
-dataset =
-
-model = train(data)

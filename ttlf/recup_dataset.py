@@ -7,7 +7,7 @@ from basketball_reference_scraper.box_scores import get_box_scores
 from basketball_reference_scraper.seasons import get_schedule
 from basketball_reference_scraper.teams import get_roster
 
-from dicos_utiles import dico_schedule, nom_a_abrev, dico_box_2019, deja_fait
+from dicos_utiles import dico_schedule, nom_a_abrev, dico_box_2019, deja_fait, dico_box
 
 
 def recup_matchs(equipe, annee):
@@ -112,6 +112,21 @@ def corriger_MIN_2019():
     MIN.to_csv('MIN2019.csv')
     return MIN, brook
 
+def corriger(equipe,joueur,annee):
+    box = dico_box[annee][equipe]
+    presence = []
+    for i in range(box.values.shape[0]):
+        if box['PLAYER'][i] == joueur:
+            print(i)
+            presence.append(i)
+    box = box.drop(presence)
+    box = box.loc[:, ~box.columns.str.contains('^Unnamed')]
+    box.to_csv(equipe + annee + '.csv')
+
+
+
+
+
 
 # -> ['PLAYER', 'MP', 'FG', 'FGA', 'FG%', '3P', '3PA', '3P%', 'FT', 'FTA', 'FT%', 'ORB', 'DRB', 'TRB', 'AST', 'STL', 'BLK', 'TOV', 'PF', 'PTS', '+/-', DATE,
 #  EQ/OPP,	TS%,	eFG%,	3PAr,	FTr,	ORB%,	DRB%,	TRB%,	AST%,	STL%,	BLK%,	TOV%,	USG%,	ORtg,	DRtg,	BPM]
@@ -119,6 +134,7 @@ def corriger_MIN_2019():
 
 def recup_tout_box(annee):
     for equipe in list(nom_a_abrev):
+        print(equipe)
         if not equipe in deja_fait:
             box_score_total_equipe = recup_box_scores(equipe, annee)
             box_score_total_equipe.to_csv(nom_a_abrev[equipe] + annee + '.csv')

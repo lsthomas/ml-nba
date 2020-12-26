@@ -38,8 +38,9 @@ def enlever_joueurs(box_score_total):
 def clean_DNP(box_score_total):
     return box_score_total.loc[
         (box_score_total['MP'] != 'Did Not Play') & (box_score_total['MP'] != 'Did Not Dress') & (
-                box_score_total['MP'] != 'Not With Team') & (box_score_total['AST%'] != 'Did Not Play') & (
-                box_score_total['AST%'] != 'Did Not Dress')]
+                box_score_total['MP'] != 'Not With Team') & (box_score_total['AST%'] != 'Did Not Play')
+                & (box_score_total['AST%'] != 'Did Not Dress')
+                & (box_score_total['AST%'] != 'Not With Team') & (box_score_total['MP'] != 'Player Suspended')]
 
 
 # Transforme les Minutes played en secondes
@@ -141,7 +142,7 @@ def moyennes(date_debut, date_fin, box_score_saison_joueur):
 
 def moyennes_sur_x_derniers_matchs(x, date, box_score_saison_joueur, annee):
     date_debut_saison, date_fin_saison = dico_dates[annee]
-    box_score_saison_avant_date = box_score_saison_joueur.loc[box_score_saison_joueur['DATE'] <= date]
+    box_score_saison_avant_date = box_score_saison_joueur.loc[box_score_saison_joueur['DATE'] < date]
     if box_score_saison_avant_date is None:  # Pas encore de matchs joués
         return pd.Series()
     if box_score_saison_avant_date.shape[0] < x:
@@ -213,7 +214,7 @@ moyennes_equipe('2019-01-01', '2020-01-01', box_score_totaux_equipe_propre(dico_
 
 def moyennes_sur_x_derniers_matchs_equipe(x, date, box_score_equipe, annee):
     date_debut_saison, date_fin_saison = dico_dates[annee]
-    box_score_saison_avant_date = box_score_equipe.loc[box_score_equipe['DATE'] <= date]
+    box_score_saison_avant_date = box_score_equipe.loc[box_score_equipe['DATE'] < date]
     if box_score_saison_avant_date is None:  # Pas encore de matchs joués
         return None
     if box_score_saison_avant_date.shape[0] < x:
