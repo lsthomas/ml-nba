@@ -150,4 +150,5 @@ del dataset_train['Unnamed: 0']
 dataset_train = dataset_train.loc[dataset_train['MP'] >= 600 ]
 
 dataset_test = dico_inputs_test['2019']
+dataset_test = dataset_test.loc[dataset_test['MP'] >= 600]
 del dataset_test['Unnamed: 0']

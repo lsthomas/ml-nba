@@ -116,12 +116,12 @@ def liste_equipe_joueur(joueur, saison):
 
 # Entrée : box_score_saison_joueur : df cleaned comme renvoyé par box_score_joueur_propre.
 # Avec colonnes = Unnamed: 0	PLAYER	MP	FG	FGA	FG%	3P	3PA	3P%	FT	FTA	FT%	ORB	DRB	TRB	AST	STL	BLK	TOV	PF	PTS	+/-	DATE	EQ/OPP	TS%	eFG%	3PAr	FTr	ORB%	DRB%	TRB%	AST%	STL%	BLK%	TOV%	USG%	ORtg	DRtg	BPM
-# Sortie : moyenne entre date de début et date de fin.
+# Sortie : moyenne entre date de début et date de fin (debut inclus, fin exclus-
 # Avec colonnes = MP	FG	FGA	FG%	3P	3PA	3P%	FT	FTA	FT%	ORB	DRB	TRB	AST	STL	BLK	TOV	PF	PTS	+/-		EQ/OPP	TS%	eFG%	3PAr	FTr	ORB%	DRB%	TRB%	AST%	STL%	BLK%	TOV%	USG%	ORtg	DRtg	BPM
 
 def moyennes(date_debut, date_fin, box_score_saison_joueur):
     box_entre_dates = box_score_saison_joueur.loc[
-        (box_score_saison_joueur['DATE'] <= date_fin) & (box_score_saison_joueur['DATE'] >= date_debut)]
+        (box_score_saison_joueur['DATE'] < date_fin) & (box_score_saison_joueur['DATE'] >= date_debut)]
     del box_entre_dates['PLAYER']
     del box_entre_dates['Unnamed: 0']
     del box_entre_dates['DATE']
@@ -193,7 +193,7 @@ def input_joueur(joueur, date):
 
 def moyennes_equipe(date_debut, date_fin, box_score_equipe):
     box_entre_dates = box_entre_dates = box_score_equipe.loc[
-        (box_score_equipe['DATE'] <= date_fin) & (box_score_equipe['DATE'] >= date_debut)]
+        (box_score_equipe['DATE'] < date_fin) & (box_score_equipe['DATE'] >= date_debut)]
     del box_entre_dates['DATE']
     del box_entre_dates['FT%']  # Del les % qui n'ont aucun sens dans une moyenne
     del box_entre_dates['3P%']
